@@ -1,0 +1,337 @@
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <title>Tetris</title>
+  </head>
+  <body>
+      <canvas id="canvas" width="500" height="550"></canvas>
+      <script type="text/javascript">
+        (function (root) {
+            root.tetris = (function(canvas){
+                //canvas configuration
+                var canvas_config = {
+                    //canvas width
+                    width : canvas.width,
+                    //canvas height
+                    height : canvas.height,
+                    //tetris columns count
+                    column : 15,
+                    //tetris row count
+                    row : 20
+                };
+                //tetris block width
+                canvas_config.unit_width = canvas.width / canvas_config.column;
+                //tetris block height
+                canvas_config.unit_height = canvas.height / canvas_config.row;
+                //tetris static blocks memory
+                canvas_config.static_array = new Array(canvas_config.row);
+                for(var i = 0; i < canvas_config.row; i++){
+                    canvas_config.static_array[i] = new Array(canvas_config.column);
+                    for(var j = 0; j < canvas_config.column; j++){
+                        canvas_config.static_array[i][j] = false;
+                    }
+                }
+                return (function(config, context){
+
+                    //display net
+                    function display_net(){
+                        context.beginPath();
+                        context.strokeStyle = '#aaa';
+                        context.lineWidth = 1;
+                        //draw net
+                        //each rows
+                        for(var i = 0; i <= config.row; i++){
+                            context.moveTo(0, i * config.unit_height);
+                            context.lineTo(config.width, i * config.unit_height);
+                            context.stroke();
+                        };
+                        //each columns
+                        for(var i = 0; i <= config.column; i++){
+                            context.moveTo(i * config.unit_width, 0);
+                            context.lineTo(i * config.unit_width, config.height);
+                            context.stroke();
+                        };
+                    };
+
+                    //build falling down block
+                    function build_falling_block(){
+                        //falling down buff
+                        var block_buff = new Array(4);
+                        block_buff[0] = [0,0];
+                        //mininmum negative position
+                        var min_position = [0,0];
+                        //current position
+                        var current_position = [0,0];
+                        for(var k = 1; k < 4; k++){
+                            var seted = false;
+                            while(!seted){
+                                var next_position = new Array(2);
+                                var direct = Math.floor(Math.random()*4);
+                                switch(direct){
+                                case 0:
+                                    next_position[0] = current_position[0] - 1;
+                                    next_position[1] = current_position[1];
+                                    break;
+                                case 1:
+                                    next_position[0] = current_position[0] + 1;
+                                    next_position[1] = current_position[1];
+                                    break;
+                                case 2:
+                                    next_position[1] = current_position[1] - 1;
+                                    next_position[0] = current_position[0];
+                                    break;
+                                case 3:
+                                    next_position[1] = current_position[1] + 1;
+                                    next_position[0] = current_position[0];
+                                    break;
+                                };
+                                seted = true;
+                                for(var j = 0; j < k; j++){
+                                    if(next_position[0] === block_buff[j][0] && next_position[1] === block_buff[j][1]){
+                                        seted = false;
+                                        break;
+                                    };
+                                };
+                                if(seted){
+                                    current_position[0] = next_position[0];
+                                    current_position[1] = next_position[1];
+
+                                    if(current_position[0] < min_position[0]){
+                                        min_position[0] = current_position[0];
+                                    };
+
+                                    if(current_position[1] < min_position[1]){
+                                        min_position[1] = current_position[1];
+                                    };
+
+                                    block_buff[k] = [current_position[0], current_position[1]];
+                                }
+                            };
+                        };
+
+                        for(var k = 0; k < 4; k++){
+                            block_buff[k][0] = block_buff[k][0] - min_position[0];
+                            block_buff[k][1] = block_buff[k][1] - min_position[1];
+                        };
+
+                        //factory falling down block
+                        return {
+                            falling_block : block_buff,
+                            row : 0,
+                            column : Math.floor(config.column / 2 - 1)
+                        };
+                    };
+
+
+                    function check_fill_row(){
+                        for(var r = 0; r < config.row; r++){
+                            var fill = true;
+                            for(var c = 0; c < config.column; c++){
+                                if(!config.static_array[r][c]){
+                                    fill = false;
+                                    break;
+                                };
+                            };
+                            if(fill){
+                                for(var tr = r; tr >= 1; tr--){
+                                    for(var tc = 0; tc < config.column; tc++){
+                                        config.static_array[tr][tc] = config.static_array[tr-1][tc];
+                                    };
+                                };
+                                for(var tc = 0; tc < config.column; tc++){
+                                    config.static_array[0][tc] = false;
+                                };
+                            };
+                        };
+                    };
+
+                    return function(){
+                        var down_block = build_falling_block();
+
+                        //initilize method
+                        this.init = function(){
+                            //init context
+                            display_net();
+                        };
+
+                        //draw static blocks
+                        this.draw_static_blocks = function(){
+                            context.fillStyle = '#000';
+                            for(var trow = 0; trow < config.row; trow++){
+                                for(var tcol = 0; tcol < config.column; tcol++){
+                                    if(config.static_array[trow][tcol] === true){
+                                        context.fillRect(tcol * config.unit_width, trow * config.unit_height, config.unit_width, config.unit_height);
+                                    };
+                                };
+                            };
+                        };
+
+                        //draw falling down block
+                        this.draw_falling_block = function(){
+                            context.fillStyle = '#000';
+                            for(var i = 0; i < 4; i++){
+                                context.fillRect((down_block.falling_block[i][0] + down_block.column)*config.unit_width, (down_block.falling_block[i][1] + down_block.row)*config.unit_height, config.unit_width, config.unit_height);
+                            };
+                        };
+
+                        //filling down block
+                        this.filling_block = function(){
+                            if((function(block){
+                                for(var k = 0; k < 4; k++){
+                                    if(block.falling_block[k][1] + block.row >= config.row - 1){
+                                        return false;
+                                    };
+                                };
+                                for(var k = 0; k < 4; k++){
+                                    if(config.static_array[block.falling_block[k][1] + block.row+1][block.falling_block[k][0]+block.column]){
+                                        return false;
+                                    };
+                                };
+                                return true;
+                            })(down_block)){
+                                down_block.row = down_block.row + 1;
+                            }
+                            else{
+                                for(var k = 0; k < 4; k++){
+                                    config.static_array[down_block.falling_block[k][1] + down_block.row][down_block.falling_block[k][0] + down_block.column] = true;
+                                };
+                                down_block = build_falling_block();
+                                check_fill_row();
+                            };
+                        };
+
+                        this.clear_screen = function(){
+                            context.clearRect(0,0, config.width, config.height);
+                            display_net();
+                        };
+
+                        this.move_left_filling_block = function(){
+                            if((function(block){
+                                for(var k = 0; k < 4; k++){
+                                    if(block.falling_block[k][0] + block.column < 1){
+                                        return false;
+                                    };
+                                };
+                                for(var k = 0; k < 4; k++){
+                                    if(config.static_array[block.falling_block[k][1] + block.row][block.falling_block[k][0]+block.column-1]){
+                                        return false;
+                                    };
+                                };
+                                return true;
+                            })(down_block)){
+                                down_block.column = down_block.column - 1;
+                            };
+                        };
+
+                        this.move_right_filling_block = function(){
+                            if((function(block){
+                                for(var k = 0; k < 4; k++){
+                                    if(block.falling_block[k][0] + block.column + 2 > config.column){
+                                        return false;
+                                    };
+                                };
+                                for(var k = 0; k < 4; k++){
+                                    if(config.static_array[block.falling_block[k][1] + block.row][block.falling_block[k][0]+block.column+1]){
+                                        return false;
+                                    };
+                                };
+                                return true;
+                            })(down_block)){
+                                down_block.column = down_block.column + 1;
+                            };
+                        };
+
+                        this.turn_filling_block = function(){
+                            var min_buff = 0;
+                            var max_buff = 10;
+                            var down_block_cache = new Array(4);
+                            for(var k = 0; k < 4; k++){
+                                down_block_cache[k] = new Array(2);
+                                down_block_cache[k][0] = down_block.falling_block[k][0];
+                                down_block_cache[k][1] = down_block.falling_block[k][1];
+                            }
+                            for(var k = 0; k < 4; k++){
+                                var tx = down_block.falling_block[k][0];
+                                down_block.falling_block[k][0] = -down_block.falling_block[k][1];
+                                down_block.falling_block[k][1] = tx;
+                                if(min_buff > down_block.falling_block[k][0]){
+                                    min_buff = down_block.falling_block[k][0];
+                                };
+                                if(max_buff > tx){
+                                    max_buff = tx;
+                                }
+                            };
+                            for(var k = 0; k < 4; k++){
+                                down_block.falling_block[k][0] = down_block.falling_block[k][0] - min_buff;
+                                down_block.falling_block[k][1] = down_block.falling_block[k][1] - max_buff;
+                            };
+
+                            var restore = false;
+                            for(var k = 0; k < 4; k++){
+                                console.log(down_block.falling_block[k][0] + down_block.column >= config.column)
+                                if(
+                                    down_block.falling_block[k][0] + down_block.column >= config.column ||
+                                    config.static_array[down_block.falling_block[k][1] + down_block.row][down_block.falling_block[k][0]+down_block.column] ||
+                                    down_block.falling_block[k][0] + down_block.column < 0 ||
+                                    config.static_array[down_block.falling_block[k][1] + down_block.row][down_block.falling_block[k][0]+down_block.column] ||
+                                    down_block.falling_block[k][1] + down_block.row >= config.row ||
+                                    config.static_array[down_block.falling_block[k][1] + down_block.row][down_block.falling_block[k][0]+down_block.column]
+                                ){
+                                    restore = true;
+                                    break;
+                                };
+                            };
+                            if(restore){
+                                for(var k = 0; k < 4; k++){
+                                    down_block.falling_block[k][0] = down_block_cache[k][0];
+                                    down_block.falling_block[k][1] = down_block_cache[k][1];
+                                };
+                            };
+                        };
+                    };
+                })(canvas_config, canvas.getContext('2d'));
+            })(document.getElementById('canvas'));
+        })(this);
+
+        var game = new tetris();
+
+        game.init();
+        setInterval(function(){
+            game.clear_screen();
+            game.filling_block();
+            game.draw_falling_block();
+            game.draw_static_blocks();
+        },1000);
+
+        window.onkeypress = function(e){
+            switch (e.key) {
+                case 'a':
+                    game.move_left_filling_block();
+                    game.clear_screen();
+                    game.draw_falling_block();
+                    game.draw_static_blocks();
+                    break;
+                case 'd':
+                    game.move_right_filling_block();
+                    game.clear_screen();
+                    game.draw_falling_block();
+                    game.draw_static_blocks();
+                    break;
+                case 's':
+                    game.filling_block();
+                    game.clear_screen();
+                    game.draw_falling_block();
+                    game.draw_static_blocks();
+                    break;
+                case 'w':
+                    game.turn_filling_block();
+                    game.clear_screen();
+                    game.draw_falling_block();
+                    game.draw_static_blocks();
+                    break;
+
+            }
+        }
+      </script>
+  </body>
+</html>
