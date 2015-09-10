@@ -79,7 +79,7 @@ public:
         L->_length = 0;
         #ifdef _CHAIN_TABLE_
         node_tp* current_node = L->_header->first;
-        while(current_node != NULL || current_node != L->_header->first){
+        while(current_node != L->_header->first){
             node_tp* delete_node = current_node;
             current_node = current_node->next;
             free(delete_node);

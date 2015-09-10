@@ -15,6 +15,10 @@ public:
         LinearList<T>::Init(S->_linearList);
     }
 
+    void static Clear(Stack* &S){
+        LinearList<T>::Clear(S->_linearList);
+    }
+
     void static Destory(Stack* &S){
         delete(S->_linearList);
     }
