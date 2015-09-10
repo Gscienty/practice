@@ -1,3 +1,8 @@
+/*
+    数据结构 : 栈
+    Author : Gscienty
+*/
+
 #include "linear_list.cpp"
 
 template<typename T>

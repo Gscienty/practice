@@ -1,3 +1,8 @@
+/*
+  ÊýÖÆ×ª»»
+  Author: Gscienty
+*/
+
 #include "stack.cpp"
 
 int main(){

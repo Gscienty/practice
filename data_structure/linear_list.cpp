@@ -1,3 +1,8 @@
+/*
+    数据结构 : 线性表
+    Author : Gscienty
+*/
+
 
 #define _CHAIN_TABLE_
 #ifndef _CHAIN_TABLE_
