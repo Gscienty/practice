@@ -58,13 +58,9 @@ private:
     }
 
 public:
-    #ifndef _CHAIN_TABLE_
-    void static Init(LinearList* &L, int size){
-    #else
     void static Init(LinearList* &L){
-    #endif
         #ifndef _CHAIN_TABLE_
-        L = new LinearList(size);
+        L = new LinearList(100);
         #else
         L = new LinearList();
         #endif
