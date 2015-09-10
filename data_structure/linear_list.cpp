@@ -1,6 +1,4 @@
 #include <iostream>
-using namespace std;
-
 #include <malloc.h>
 template<typename T>
 class LinearList{
@@ -9,9 +7,9 @@ private:
     int _length;
     int _size;
 
-    LinearList(){
-        this->_array = (T*)malloc(sizeof(T));
-        this->_size = 1;
+    LinearList(int size){
+        this->_size = size;
+        this->_array = (T*)malloc(sizeof(T) * this->_size);
         this->_length = 0;
     }
 
@@ -20,8 +18,8 @@ private:
     }
 
 public:
-    void static Init(LinearList* &L){
-        L = new LinearList();
+    void static Init(LinearList* &L, int size){
+        L = new LinearList(size);
     }
 
     void static Destroy(LinearList* &L){
@@ -30,6 +28,10 @@ public:
 
     void static Clear(LinearList* &L){
         L->_length = 0;
+    }
+
+    bool static Empty(const LinearList* L){
+        return L->_length == 0;
     }
 
     int static Length(const LinearList* L){
@@ -70,7 +72,7 @@ public:
         if(1 <= i && i <= L->_length + 1){
             if(L->_size < L->_length + 1){
                 L->_size <<= 1;
-                L->_array = (T*)realloc(L->_array, L->_size);
+                realloc(L->_array, L->_size);   //error
             }
             for(int p = L->_length; p >= i; p--){
                 L->_array[p] = L->_array[p - 1];
@@ -94,12 +96,3 @@ public:
         }
     }
 };
-
-bool trav(int i){
-    cout << i;
-    return true;
-}
-
-int main(){
-    return 0;
-}
