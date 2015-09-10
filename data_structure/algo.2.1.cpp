@@ -3,10 +3,16 @@
 #include "linear_list.cpp"
 
 void init(LinearList<int>* &A, LinearList<int>* &B, LinearList<int>* &C){
-    LinearList<int>::Init(A, 4);
-    LinearList<int>::Init(B, 11);
-    LinearList<int>::Init(C, 20);
 
+#ifndef _CHAIN_TABLE_
+    LinearList<int>::Init(A,4);
+    LinearList<int>::Init(B,11);
+    LinearList<int>::Init(C,20);
+#else
+    LinearList<int>::Init(A);
+    LinearList<int>::Init(B);
+    LinearList<int>::Init(C);
+#endif
     LinearList<int>::Insert(A, 1, 11);
     LinearList<int>::Insert(A, 1, 8);
     LinearList<int>::Insert(A, 1, 5);
@@ -33,7 +39,6 @@ int main(){
     LinearList<int>* LC;
 
     init(LA, LB, LC);
-
     LinearList<int>::Traverse(LA, (const bool(*)(const int))display);
     std::cout << std::endl;
     LinearList<int>::Traverse(LB, (const bool(*)(const int))display);
