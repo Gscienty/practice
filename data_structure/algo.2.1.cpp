@@ -1,3 +1,7 @@
+/*
+    归并排序
+    Author: Gscienty
+*/
 #include <iostream>
 
 #include "linear_list.cpp"
