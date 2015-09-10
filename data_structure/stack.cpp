@@ -14,22 +14,16 @@ public:
         delete(S->_linearList);
     }
 
-    bool static Empty(Stack* S){
-        return S->_linearList->Empty();
+    bool static Empty(const Stack* S){
+        return LinearList<T>::Empty(S->_linearList);
     }
 
     int static Length(Stack* S){
-        return S->_linearList->Length();
+        return LinearList<T>::Length(S->_linearList);
     }
 
     void static GetTop(const Stack* S, T& e){
-        #ifdef _CHAIN_TABLE_
-        T temp;
-        LinearList<T>::GetElem(S->_linearList, 0, temp);
-        LinearList<T>::PriorElem(S->_linearList, temp, e);
-        #else
-        LinearList<T>::GetElem(S->_linearList, LinearList<T>::Length(S->_linearList), e);
-        #endif // _CHAIN_TABLE_
+        LinearList<T>::GetElem(S->_linearList, 0, e);
     }
 
     void static Push(Stack* &S, const T e){
