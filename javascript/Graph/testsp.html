@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+	<head></head>
+	<body>
+		<canvas id="Hello" width="800" height="600"></canvas>
+		
+		<script src="ShapeGrammerMachine/shape.js"></script>
+		
+		<script>
+			var arr = new Arrangement();
+			arr.save('Hello');
+			
+			arr.append(new Line(ctorPoint(0,0), ctorPoint(0,100)))
+				.append(new Line(ctorPoint(0,100), ctorPoint(100,100)))
+				.append(new Line(ctorPoint(100,100), ctorPoint(100,0)))
+				.append(new Line(ctorPoint(100, 0), ctorPoint(0,0)));
+			
+			arr.transf('Hello', function(ctx){
+				ctx.scale(0.25,0.25);
+				ctx.translate(1000, 0);
+			});
+			
+			for(var j = 0; j < 8; j++){
+				arr.save('Hello');
+				for(var i=0; i<36; i++){
+					arr.display('Hello', 3, function(ctx, i){
+						if(i == 3) ctx.rotate(Math.PI/3);
+						else if(i == 2) ctx.rotate(Math.PI/6);
+						ctx.translate(120,5);
+					}).transf('Hello',function(ctx){
+						ctx.translate(110, 0);
+						ctx.rotate(Math.PI/12);
+					});
+				}
+				arr.reset('Hello');
+				arr.transf('Hello', function(ctx){
+					ctx.translate(0, 120);
+				})
+			}
+		</script>
+	</body>
+</html>

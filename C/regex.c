@@ -11,42 +11,51 @@ int main(){
     char* string_pointer = input_string;
     char* regex_pointer = input_regex;
 
-    char* start = 0;
     int length = 0;
 
-    while(*string_pointer & *regex_pointer){
-        switch(*regex_pointer){
-        case '.':
-            regex_pointer++;
-            length++;
+    unsigned char match = 0;
+
+    char* start_pointer = 0;
+
+    while(*regex_pointer){
+        unsigned char origin_match = match;
+        if(!match && regex_pointer == input_regex) start_pointer = string_pointer;
+        switch (*regex_pointer){
+        case '^':
+            match = string_pointer == input_string;
+            break;
+        case '$':
+            match = !*string_pointer;
+            break;
+        case '*':
+            if(match){
+                regex_pointer -= 2;
+            }
+            string_pointer--;
+            match = 1;
+            break;
+        case '+':
+            if(match){
+                regex_pointer -= 2;
+            }
+            else regex_pointer = input_regex - 1;
+            string_pointer--;
+            match = 1;
+            break;
+        case '?':
+            string_pointer--;
+            match = 1;
             break;
         default:
-            if(*regex_pointer == *string_pointer){
-                if(regex_pointer[1] != '*') regex_pointer++;
-                length++;
-            }
-            else{
-                if(regex_pointer[1] == '*'){
-                    regex_pointer += 2;
-                    length++;
-                }
-                else length = -1;
-            }
+            match = *string_pointer == *regex_pointer;
+            if(!origin_match && !match) regex_pointer = input_regex - 1;
         }
-        if(length == -1){
-            regex_pointer = input_regex;
-            length = 0;
-            start = 0;
-        }
-        else if(length == 1 && !start){
-            start = string_pointer;
-        }
-        string_pointer++;
+        regex_pointer++;
+        if(*string_pointer) string_pointer++;
+        else break;
     }
-    printf("%d\n", length);
-    while(length--){
-        printf("%c", *start++);
-    }
+    if(*string_pointer) *(string_pointer - 1) = 0;
 
+    printf("%s\n", start_pointer);
     return 0;
 }
