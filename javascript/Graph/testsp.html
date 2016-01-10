@@ -15,11 +15,6 @@
 				.append(new Line(ctorPoint(100,100), ctorPoint(100,0)))
 				.append(new Line(ctorPoint(100, 0), ctorPoint(0,0)));
 			
-			arr.transf('Hello', function(ctx){
-				ctx.scale(0.25,0.25);
-				ctx.translate(1000, 0);
-			});
-			
 			for(var j = 0; j < 8; j++){
 				arr.save('Hello');
 				for(var i=0; i<36; i++){
