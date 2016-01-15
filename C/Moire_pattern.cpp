@@ -1,3 +1,4 @@
+
 #include <malloc.h>
 #include <vector>
 #include <opencv2/core/core.hpp>
@@ -7,7 +8,7 @@ int main()
 {
 	using namespace cv;
 
-	int input_size = 2;
+	int input_size = 5;
 	int disp_width = 10;
 
 	int block_width = disp_width * (input_size - 1);
@@ -53,8 +54,6 @@ int main()
 			image_offset += disp_width;
 		}
 	}
-
-	cvShowImage("result", result);
-	waitKey();
+	cvSaveImage("result.jpg", result);
 	return 0;
 }
